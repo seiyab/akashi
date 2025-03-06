@@ -14,61 +14,60 @@ type dpCell struct {
 	fromB int
 }
 
-func mixedEntries[List any](
+func mixedEntries(
 	p diffProcess,
-	v1, v2 List,
-	length func(List) int,
-	getReflect func(List, int) reflect.Value,
+	leftLength, rightLength int,
+	getLeft, getRight func(int) reflect.Value,
 ) ([]entry, error) {
 	leading := make([]entry, 0)
-	for i := 0; i < length(v1) && i < length(v2); i++ {
-		t := p.diff(getReflect(v1, i), getReflect(v2, i))
+	for i := 0; i < leftLength && i < rightLength; i++ {
+		t := p.diff(getLeft(i), getRight(i))
 		if t.loss() > 0 {
 			break
 		}
-		leading = append(leading, entry{value: p.leftPure(getReflect(v1, i))})
+		leading = append(leading, entry{value: p.leftPure(getLeft(i))})
 	}
 	k := len(leading)
 
-	dp := make([][]dpCell, length(v1)-k+1)
+	dp := make([][]dpCell, leftLength-k+1)
 	for i := range dp {
-		dp[i] = make([]dpCell, length(v2)-k+1)
+		dp[i] = make([]dpCell, rightLength-k+1)
 		for j := range dp[i] {
 			dp[i][j] = dpCell{loss: math.MaxFloat64}
 		}
 	}
 	dp[0][0] = dpCell{loss: 0}
-	for b := 0; k+b < length(v2)+1; b++ {
-		for a := 0; k+a < length(v1)+1; a++ {
+	for b := 0; k+b < rightLength+1; b++ {
+		for a := 0; k+a < leftLength+1; a++ {
 			l := dp[a][b].loss
-			if k+a < length(v1) {
+			if k+a < leftLength {
 				if l+1 < dp[a+1][b].loss {
 					dp[a+1][b] = dpCell{
 						loss: l + 1,
 						entry: entry{
 							leftOnly: true,
-							value:    p.leftPure(getReflect(v1, k+a)),
+							value:    p.leftPure(getLeft(k + a)),
 						},
 						fromA: a,
 						fromB: b,
 					}
 				}
 			}
-			if k+b < length(v2) {
+			if k+b < rightLength {
 				if l+1 < dp[a][b+1].loss {
 					dp[a][b+1] = dpCell{
 						loss: l + 1,
 						entry: entry{
 							rightOnly: true,
-							value:     p.rightPure(getReflect(v2, k+b)),
+							value:     p.rightPure(getRight(k + b)),
 						},
 						fromA: a,
 						fromB: b,
 					}
 				}
 			}
-			if k+a < length(v1) && k+b < length(v2) {
-				t := p.diff(getReflect(v1, k+a), getReflect(v2, k+b))
+			if k+a < leftLength && k+b < rightLength {
+				t := p.diff(getLeft(k+a), getRight(k+b))
 				tl := t.loss()
 				switch t.(type) {
 				case mixed, cycle, nilNode, format1:
@@ -90,8 +89,8 @@ func mixedEntries[List any](
 		return nil, fmt.Errorf("failed to compute diff")
 	}
 
-	trailing := make([]entry, 0, length(v1)+length(v2))
-	for a, b := length(v1)-k, length(v2)-k; a > 0 || b > 0; {
+	trailing := make([]entry, 0, leftLength+rightLength)
+	for a, b := leftLength-k, rightLength-k; a > 0 || b > 0; {
 		cell := dp[a][b]
 		trailing = append(trailing, cell.entry)
 		if !(cell.fromA < a || cell.fromB < b) {
@@ -114,9 +113,9 @@ func sliceMixedEntries(v1, v2 reflect.Value, p diffProcess) ([]entry, error) {
 	}
 	es, err := mixedEntries(
 		p,
-		v1, v2,
-		func(v reflect.Value) int { return v.Len() },
-		func(v reflect.Value, i int) reflect.Value { return v.Index(i) },
+		v1.Len(), v2.Len(),
+		func(i int) reflect.Value { return v1.Index(i) },
+		func(i int) reflect.Value { return v2.Index(i) },
 	)
 	if err != nil {
 		return nil, err
@@ -127,9 +126,9 @@ func sliceMixedEntries(v1, v2 reflect.Value, p diffProcess) ([]entry, error) {
 func multiLineStringEntries(v1, v2 []string, p diffProcess) ([]entry, error) {
 	return mixedEntries(
 		p,
-		v1, v2,
-		func(v []string) int { return len(v) },
-		func(v []string, i int) reflect.Value { return reflect.ValueOf(v[i]) },
+		len(v1), len(v2),
+		func(i int) reflect.Value { return reflect.ValueOf(v1[i]) },
+		func(i int) reflect.Value { return reflect.ValueOf(v2[i]) },
 	)
 }
 

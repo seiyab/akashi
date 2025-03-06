@@ -16,15 +16,25 @@ func WithReflectEqual(fn func(v1, v2 reflect.Value) bool) Option {
 }
 
 // WithFormat sets a function to format a value.
-func WithFormat[T any](fn func(T) string) Option {
+func WithFormat(fn interface{}) Option {
 	return func(d *differ) *differ {
-		var zero T
+		fnValue := reflect.ValueOf(fn)
+		fnType := fnValue.Type()
+		if fnType.Kind() != reflect.Func || fnType.NumIn() != 1 || fnType.NumOut() != 1 {
+			panic("WithFormat: fn must be a function with one input and one output")
+		}
+		if fnType.Out(0).Kind() != reflect.String {
+			panic("WithFormat: fn must return a string")
+		}
+
 		if d.formats == nil {
 			d.formats = make(map[reflect.Type]func(reflect.Value) string)
 		}
-		d.formats[reflect.TypeOf(zero)] = func(v reflect.Value) string {
-			r := reflect.ValueOf(fn)
-			return r.Call([]reflect.Value{v})[0].String()
+
+		// Get the type from the function's input parameter
+		inputType := fnType.In(0)
+		d.formats[inputType] = func(v reflect.Value) string {
+			return fnValue.Call([]reflect.Value{v})[0].String()
 		}
 		return d
 	}
