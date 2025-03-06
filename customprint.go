@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-var stringerType = reflect.TypeFor[fmt.Stringer]()
+var stringerType = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 
 func printStringer(v reflect.Value) *string {
 	if !v.Type().Implements(stringerType) || !v.CanInterface() {
