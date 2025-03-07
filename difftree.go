@@ -6,7 +6,7 @@ import (
 	"github.com/seiyab/akashi/internal/doc"
 )
 
-type DiffTree struct {
+type root struct {
 	inner diffTree
 }
 
@@ -23,7 +23,7 @@ var _ diffTree = format1{}
 var _ diffTree = format2{}
 var _ diffTree = fail{}
 
-func (d DiffTree) Format() string {
+func (d root) format() string {
 	o := d.inner.docs()
 	return doc.PrintDoc(o)
 }

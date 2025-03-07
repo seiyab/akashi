@@ -13,7 +13,7 @@ func DiffString(x, y interface{}, options ...Option) string {
 		d = *opt(&d)
 	}
 	t := d.diff(x, y)
-	return t.Format()
+	return t.format()
 }
 
 type differ struct {
@@ -23,12 +23,12 @@ type differ struct {
 
 type formats map[reflect.Type]func(reflect.Value) string
 
-func (d differ) diff(x, y interface{}) DiffTree {
+func (d differ) diff(x, y interface{}) root {
 	v1 := reflect.ValueOf(x)
 	v2 := reflect.ValueOf(y)
 	p := diffProcess{differ: d}
 	t := p.diff(v1, v2)
-	return DiffTree{inner: t}
+	return root{inner: t}
 }
 
 type diffProcess struct {
