@@ -168,15 +168,15 @@ func TestDiff_Map(t *testing.T) {
 	t.Run("map with interface key", func(t *testing.T) {
 		type testCase struct {
 			name  string
-			left  map[any]int
-			right map[any]int
+			left  map[interface{}]int
+			right map[interface{}]int
 			want  string
 		}
 		for _, tc := range []testCase{
 			{
 				name:  "mixed key types",
-				left:  map[any]int{1: 10, "x": 20, true: 30},
-				right: map[any]int{1: 10, "x": 25, true: 30},
+				left:  map[interface{}]int{1: 10, "x": 20, true: 30},
+				right: map[interface{}]int{1: 10, "x": 25, true: 30},
 				want: strings.Join([]string{
 					`  map[interface {}]int{`,
 					`-   "x": 20,`,
@@ -188,8 +188,8 @@ func TestDiff_Map(t *testing.T) {
 			},
 			{
 				name:  "with nil key",
-				left:  map[any]int{nil: 1, "x": 2},
-				right: map[any]int{nil: 1, "y": 2},
+				left:  map[interface{}]int{nil: 1, "x": 2},
+				right: map[interface{}]int{nil: 1, "y": 2},
 				want: strings.Join([]string{
 					`  map[interface {}]int{`,
 					`-   "x": 2,`,

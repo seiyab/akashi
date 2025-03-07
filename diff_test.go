@@ -194,7 +194,7 @@ func TestDiff_TypeMismatch(t *testing.T) {
 	})
 }
 
-func runTest(t *testing.T, left, right any, want string, opts ...akashi.Option) {
+func runTest(t *testing.T, left, right interface{}, want string, opts ...akashi.Option) {
 	t.Helper()
 	d := akashi.DiffString(left, right, opts...)
 	if d != want {
