@@ -7,7 +7,7 @@ import (
 )
 
 // DiffString returns a string that represents the difference between x and y.
-func DiffString(x, y any, options ...Option) string {
+func DiffString(x, y interface{}, options ...Option) string {
 	d := differ{}
 	for _, opt := range options {
 		d = *opt(&d)
@@ -23,7 +23,7 @@ type differ struct {
 
 type formats map[reflect.Type]func(reflect.Value) string
 
-func (d differ) diff(x, y any) DiffTree {
+func (d differ) diff(x, y interface{}) DiffTree {
 	v1 := reflect.ValueOf(x)
 	v2 := reflect.ValueOf(y)
 	p := diffProcess{differ: d}

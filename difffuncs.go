@@ -129,19 +129,39 @@ func stringDiff(v1, v2 reflect.Value, p diffProcess) diffTree {
 	}
 }
 
-var intDiff = primitiveDiff(func(v reflect.Value) int64 { return v.Int() })
-var uintDiff = primitiveDiff(func(v reflect.Value) uint64 { return v.Uint() })
-var boolDiff = primitiveDiff(func(v reflect.Value) bool { return v.Bool() })
-var floatDiff = primitiveDiff(func(v reflect.Value) float64 { return v.Float() })
-var complexDiff = primitiveDiff(func(v reflect.Value) complex128 { return v.Complex() })
-
-func primitiveDiff[T comparable](f func(v reflect.Value) T) diffFunc {
-	return func(v1, v2 reflect.Value, p diffProcess) diffTree {
-		if f(v1) == f(v2) {
-			return p.pure(v1)
-		}
-		return p.eachSide(v1, v2)
+var intDiff = func(v1, v2 reflect.Value, p diffProcess) diffTree {
+	if v1.Int() == v2.Int() {
+		return p.pure(v1)
 	}
+	return p.eachSide(v1, v2)
+}
+
+var uintDiff = func(v1, v2 reflect.Value, p diffProcess) diffTree {
+	if v1.Uint() == v2.Uint() {
+		return p.pure(v1)
+	}
+	return p.eachSide(v1, v2)
+}
+
+var boolDiff = func(v1, v2 reflect.Value, p diffProcess) diffTree {
+	if v1.Bool() == v2.Bool() {
+		return p.pure(v1)
+	}
+	return p.eachSide(v1, v2)
+}
+
+var floatDiff = func(v1, v2 reflect.Value, p diffProcess) diffTree {
+	if v1.Float() == v2.Float() {
+		return p.pure(v1)
+	}
+	return p.eachSide(v1, v2)
+}
+
+var complexDiff = func(v1, v2 reflect.Value, p diffProcess) diffTree {
+	if v1.Complex() == v2.Complex() {
+		return p.pure(v1)
+	}
+	return p.eachSide(v1, v2)
 }
 
 func mapDiff(v1, v2 reflect.Value, p diffProcess) diffTree {

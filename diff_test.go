@@ -72,7 +72,7 @@ func TestDiff_Pointer(t *testing.T) {
 	})
 
 	t.Run("same", func(t *testing.T) {
-		runTest(t, ref(100), ref(100), "")
+		runTest(t, refInt(100), refInt(100), "")
 	})
 
 	t.Run("different", func(t *testing.T) {
@@ -80,11 +80,11 @@ func TestDiff_Pointer(t *testing.T) {
 			`- &100`,
 			`+ &200`,
 		}, "\n")
-		runTest(t, ref(100), ref(200), expected)
+		runTest(t, refInt(100), refInt(200), expected)
 	})
 }
 
-func ref[T any](x T) *T {
+func refInt(x int) *int {
 	return &x
 }
 
@@ -194,7 +194,7 @@ func TestDiff_TypeMismatch(t *testing.T) {
 	})
 }
 
-func runTest(t *testing.T, left, right any, want string, opts ...akashi.Option) {
+func runTest(t *testing.T, left, right interface{}, want string, opts ...akashi.Option) {
 	t.Helper()
 	d := akashi.DiffString(left, right, opts...)
 	if d != want {
