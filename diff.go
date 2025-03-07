@@ -46,11 +46,17 @@ type visit struct {
 
 const maxDepth = 500
 
-func (p diffProcess) diff(v1, v2 reflect.Value) diffTree {
+func (p diffProcess) diff(v1, v2 reflect.Value) (result diffTree) {
 	if p.depth > maxDepth {
 		return fail{difference: 1, message: "max depth exceeded"}
 	}
 	p.depth = p.depth + 1
+
+	defer func() {
+		if r := recover(); r != nil {
+			result = fail{difference: 1, message: fmt.Sprintf("panic: %v", r)}
+		}
+	}()
 
 	d := p.differ
 	if d.reflectEqual != nil {
