@@ -72,7 +72,7 @@ func TestDiff_Pointer(t *testing.T) {
 	})
 
 	t.Run("same", func(t *testing.T) {
-		runTest(t, ref(100), ref(100), "")
+		runTest(t, refInt(100), refInt(100), "")
 	})
 
 	t.Run("different", func(t *testing.T) {
@@ -80,11 +80,11 @@ func TestDiff_Pointer(t *testing.T) {
 			`- &100`,
 			`+ &200`,
 		}, "\n")
-		runTest(t, ref(100), ref(200), expected)
+		runTest(t, refInt(100), refInt(200), expected)
 	})
 }
 
-func ref[T any](x T) *T {
+func refInt(x int) *int {
 	return &x
 }
 
