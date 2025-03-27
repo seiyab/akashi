@@ -37,6 +37,10 @@ func PrintDoc(ds []Doc) string {
 					shouldPrint[j] = true
 				}
 			}
+			if k := i - sightWidth - 2; k >= 0 && shouldPrint[k] {
+				// prevent skipping just a single line
+				shouldPrint[k+1] = true
+			}
 		}
 	}
 
