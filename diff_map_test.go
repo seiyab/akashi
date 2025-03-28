@@ -148,7 +148,7 @@ func TestDiff_Map(t *testing.T) {
 				},
 				want: strings.Join([]string{
 					`  map[string]map[string]int{`,
-					`:`,
+					`    "x": map[string]int{`,
 					`      "a": 1,`,
 					`    },`,
 					`-   "y": map[string]int(nil),`,
