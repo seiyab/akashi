@@ -75,7 +75,7 @@ func TestDiff_Format(t *testing.T) {
 			return fmt.Sprintf("custom format(%d)", v)
 		}),
 		akashi.WithFormat(func(v time.Time) string {
-			return v.Format(time.DateOnly)
+			return v.Format("2006-01-02")
 		}),
 	}
 	t.Run("format", func(t *testing.T) {
