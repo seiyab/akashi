@@ -70,10 +70,14 @@ func TestDiff_Stringer(t *testing.T) {
 }
 
 func TestDiff_Format(t *testing.T) {
-	o := akashi.WithFormat(func(v int) string {
-		return fmt.Sprintf("custom format(%d)", v)
-	})
-
+	opts := []akashi.Option{
+		akashi.WithFormat(func(v int) string {
+			return fmt.Sprintf("custom format(%d)", v)
+		}),
+		akashi.WithFormat(func(v time.Time) string {
+			return v.Format("2006-01-02")
+		}),
+	}
 	t.Run("format", func(t *testing.T) {
 		runTest(t,
 			1,
@@ -82,7 +86,7 @@ func TestDiff_Format(t *testing.T) {
 				`- int("custom format(1)")`,
 				`+ int("custom format(2)")`,
 			}, "\n"),
-			o,
+			opts...,
 		)
 	})
 
@@ -98,7 +102,31 @@ func TestDiff_Format(t *testing.T) {
 				`    int("custom format(4)"),`,
 				`  }`,
 			}, "\n"),
-			o,
+			opts...,
+		)
+	})
+
+	t.Run("stringer", func(t *testing.T) {
+		runTest(t,
+			[]time.Time{
+				time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+				time.Date(2025, 1, 2, 0, 0, 0, 0, time.UTC),
+				time.Date(2025, 1, 3, 0, 0, 0, 0, time.UTC),
+			},
+			[]time.Time{
+				time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+				time.Date(2025, 1, 5, 0, 0, 0, 0, time.UTC),
+				time.Date(2025, 1, 3, 0, 0, 0, 0, time.UTC),
+			},
+			strings.Join([]string{
+				`  []time.Time{`,
+				`    time.Time("2025-01-01"),`,
+				`-   time.Time("2025-01-02"),`,
+				`+   time.Time("2025-01-05"),`,
+				`    time.Time("2025-01-03"),`,
+				`  }`,
+			}, "\n"),
+			opts...,
 		)
 	})
 }
