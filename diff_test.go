@@ -44,10 +44,12 @@ func TestDiff_Primitive(t *testing.T) {
 
 func TestDiff_Func(t *testing.T) {
 	t.Run("same", func(t *testing.T) {
+		f1 := func(*testing.T) {}
+		f2 := func(*testing.T) {}
 		// NOTE: reflect.DeepEqual cannot compare functions.
-		runTest(t, func(*testing.T) {}, func(*testing.T) {}, strings.Join([]string{
-			`- func(*testing.T) { ... }`,
-			`+ func(*testing.T) { ... }`,
+		runTest(t, f1, f2, strings.Join([]string{
+			fmt.Sprintf(`- func(*testing.T) { ... } at [%p]`, f1),
+			fmt.Sprintf(`+ func(*testing.T) { ... } at [%p]`, f2),
 		}, "\n"))
 	})
 
@@ -150,20 +152,23 @@ func TestDiff_Chan(t *testing.T) {
 		type s struct {
 			c chan bool
 		}
-		runTest(t, s{c: nil}, s{c: make(chan bool)}, strings.Join([]string{
+		c := make(chan bool)
+		runTest(t, s{c: nil}, s{c: c}, strings.Join([]string{
 			`  akashi_test.s{`,
 			`-   c: chan bool(nil),`,
-			`+   c: chan bool,`,
+			fmt.Sprintf(`+   c: chan bool at [%p],`, c),
 			`  }`,
 		}, "\n"))
 	})
 
 	t.Run("different", func(t *testing.T) {
+		c1 := make(<-chan string)
+		c2 := make(<-chan string)
 		expected := strings.Join([]string{
-			`- <-chan string`,
-			`+ <-chan string`,
+			fmt.Sprintf(`- <-chan string at [%p]`, c1),
+			fmt.Sprintf(`+ <-chan string at [%p]`, c2),
 		}, "\n")
-		runTest(t, make(<-chan string), make(<-chan string), expected)
+		runTest(t, c1, c2, expected)
 	})
 }
 

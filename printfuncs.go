@@ -74,7 +74,7 @@ func printChan(m mixed) []doc.Doc {
 		}
 	}
 	return []doc.Doc{
-		doc.Inline(ty),
+		doc.Inline(fmt.Sprintf("%s at [0x%x]", ty, m.sample.Pointer())),
 	}
 }
 
@@ -195,7 +195,7 @@ func printFn(m mixed) []doc.Doc {
 		}
 	}
 	return []doc.Doc{
-		doc.Inline(fmt.Sprintf("%s { ... }", ty)),
+		doc.Inline(fmt.Sprintf("%s { ... } at [0x%x]", ty, m.sample.Pointer())),
 	}
 }
 
