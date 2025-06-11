@@ -67,7 +67,7 @@ type mixed struct {
 	entries  []entry
 }
 
-func (m mixed) docs() []doc.Doc {
+func (m mixed) docs() (docs []doc.Doc) {
 	if m.sample.Type().Implements(stringerType) && m.distance == 0 {
 		mt := printStringer(m.sample)
 		if mt != nil {
@@ -83,6 +83,13 @@ func (m mixed) docs() []doc.Doc {
 			doc.Inline(fmt.Sprintf("%s(failed to print)", m.sample.Type())),
 		}
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			docs = []doc.Doc{
+				doc.Inline(fmt.Sprintf("%s(failed to print)", m.sample.Type())),
+			}
+		}
+	}()
 	return f(m)
 }
 
