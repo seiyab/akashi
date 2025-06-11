@@ -8,6 +8,7 @@
 
 -   Compares two Go values of any type.
 -   Returns a human-readable string representing the differences.
+-   Supports the `fmt.Stringer` interface for readable output. For example, `time.Time` values are displayed as `time.Time("2025-02-03 23:03:15 +0000 UTC")`.
 
 ## Installation
 
