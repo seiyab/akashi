@@ -60,9 +60,7 @@ func WithColor(profile ...ColorProfile) Option {
 				p.Reset = DefaultColorProfile.Reset
 			}
 		}
-		d.printer = func(ds []doc.Doc) string {
-			return doc.PrintDoc(ds, p)
-		}
+		d.colorProfile = &p
 		return d
 	}
 }
