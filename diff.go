@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"unsafe"
+
+	"github.com/seiyab/akashi/internal/doc"
 )
 
 // DiffString returns a string that represents the difference between x and y.
@@ -12,6 +14,11 @@ func DiffString(x, y interface{}, options ...Option) string {
 	for _, opt := range options {
 		d = *opt(&d)
 	}
+	if d.printer == nil {
+		d.printer = func(ds []doc.Doc) string {
+			return doc.PrintDoc(ds)
+		}
+	}
 	t := d.diff(x, y)
 	return t.format()
 }
@@ -19,6 +26,7 @@ func DiffString(x, y interface{}, options ...Option) string {
 type differ struct {
 	reflectEqual func(v1, v2 reflect.Value) bool
 	formats      formats
+	printer      func([]doc.Doc) string
 }
 
 type formats map[reflect.Type]func(reflect.Value) string
@@ -28,7 +36,7 @@ func (d differ) diff(x, y interface{}) root {
 	v2 := reflect.ValueOf(y)
 	p := diffProcess{differ: d}
 	t := p.diff(v1, v2)
-	return root{inner: t}
+	return root{inner: t, printer: d.printer}
 }
 
 type diffProcess struct {

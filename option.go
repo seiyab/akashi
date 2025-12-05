@@ -2,10 +2,21 @@ package akashi
 
 import (
 	"reflect"
+
+	"github.com/seiyab/akashi/internal/doc"
 )
 
 // Option is an option for DiffString.
 type Option func(*differ) *differ
+
+type ColorProfile = doc.ColorProfile
+
+var DefaultColorProfile = ColorProfile{
+	Left:    "\x1b[31m",
+	Right:   "\x1b[32m",
+	Context: "",
+	Reset:   "\x1b[0m",
+}
 
 // WithReflectEqual sets a function to compare reflect.Value.
 func WithReflectEqual(fn func(v1, v2 reflect.Value) bool) Option {
@@ -35,6 +46,22 @@ func WithFormat(fn interface{}) Option {
 		inputType := fnType.In(0)
 		d.formats[inputType] = func(v reflect.Value) string {
 			return fnValue.Call([]reflect.Value{v})[0].String()
+		}
+		return d
+	}
+}
+
+func WithColor(profile ...ColorProfile) Option {
+	return func(d *differ) *differ {
+		p := DefaultColorProfile
+		if len(profile) > 0 {
+			p = profile[0]
+			if p.Reset == "" {
+				p.Reset = DefaultColorProfile.Reset
+			}
+		}
+		d.printer = func(ds []doc.Doc) string {
+			return doc.PrintDoc(ds, p)
 		}
 		return d
 	}

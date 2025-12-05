@@ -9,24 +9,25 @@ func Inline(text string) inline {
 type inline struct {
 	onLeft  bool
 	onRight bool
-	warn    bool
 	text    string
 }
 
 func (l inline) print(depth int) virtualLines {
 	var marker string = "  "
+	kind := lineContext
 	isLeft := l.onLeft && !l.onRight
 	isRight := l.onRight && !l.onLeft
 	if isLeft {
 		marker = "- "
+		kind = lineLeft
 	} else if isRight {
 		marker = "+ "
-	} else if l.warn {
-		marker = "! "
+		kind = lineRight
 	}
 	return virtualLines{
 		{
 			isDiff: isLeft || isRight,
+			kind:   kind,
 			text:   marker + strings.Repeat(" ", depth*indentSize) + l.text,
 		},
 	}
@@ -41,11 +42,6 @@ func (l inline) Left() Doc {
 func (l inline) Right() Doc {
 	l.onLeft = false
 	l.onRight = true
-	return l
-}
-
-func (l inline) Warn() Doc {
-	l.warn = true
 	return l
 }
 
