@@ -14,7 +14,7 @@ type ColorProfile = doc.ColorProfile
 var DefaultColorProfile = ColorProfile{
 	Left:    "\x1b[31m",
 	Right:   "\x1b[32m",
-	Context: "",
+	Neutral: "",
 	Reset:   "\x1b[0m",
 }
 

@@ -14,20 +14,20 @@ type inline struct {
 
 func (l inline) print(depth int) virtualLines {
 	var marker string = "  "
-	kind := lineContext
+	side := lineNeutral
 	isLeft := l.onLeft && !l.onRight
 	isRight := l.onRight && !l.onLeft
 	if isLeft {
 		marker = "- "
-		kind = lineLeft
+		side = lineLeft
 	} else if isRight {
 		marker = "+ "
-		kind = lineRight
+		side = lineRight
 	}
 	return virtualLines{
 		{
 			isDiff: isLeft || isRight,
-			kind:   kind,
+			side:   side,
 			text:   marker + strings.Repeat(" ", depth*indentSize) + l.text,
 		},
 	}

@@ -9,10 +9,10 @@ const (
 	sightWidth = 2
 )
 
-type lineKind int
+type lineSide int
 
 const (
-	lineContext lineKind = iota
+	lineNeutral lineSide = iota
 	lineLeft
 	lineRight
 )
@@ -20,7 +20,7 @@ const (
 type ColorProfile struct {
 	Left    string
 	Right   string
-	Context string
+	Neutral string
 	Reset   string
 }
 
@@ -62,7 +62,7 @@ func PrintDoc(ds []Doc, profile ...ColorProfile) string {
 type virtualLine struct {
 	isContext bool
 	isDiff    bool
-	kind      lineKind
+	side      lineSide
 	text      string
 }
 
@@ -97,13 +97,13 @@ func renderLines(ds []Doc) (virtualLines, []bool) {
 
 func paintLine(vl virtualLine, profile ColorProfile) string {
 	var color string
-	switch vl.kind {
+	switch vl.side {
 	case lineLeft:
 		color = profile.Left
 	case lineRight:
 		color = profile.Right
-	case lineContext:
-		color = profile.Context
+	case lineNeutral:
+		color = profile.Neutral
 	}
 
 	if color == "" {
