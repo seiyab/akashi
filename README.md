@@ -68,7 +68,7 @@ func DiffString(x, y interface{}, options ...Option) string
 ```
 
 `DiffString` returns a string that represents the difference between `x` and `y`.
-You can pass `Option`s to customize the diffing process.
+You can pass `Option`s to customize the diffing process and output.
 
 ## Contributing
 

@@ -7,7 +7,8 @@ import (
 )
 
 type root struct {
-	inner diffTree
+	inner   diffTree
+	printer func([]doc.Doc) string
 }
 
 type diffTree interface {
@@ -25,6 +26,9 @@ var _ diffTree = fail{}
 
 func (d root) format() string {
 	o := d.inner.docs()
+	if d.printer != nil {
+		return d.printer(o)
+	}
 	return doc.PrintDoc(o)
 }
 
